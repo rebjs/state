@@ -1,3 +1,3 @@
-# REBjs: State
+# State
 
 Simplified redux state and persistence management.
