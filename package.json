@@ -1,0 +1,43 @@
+{
+  "name": "@reb/state",
+  "version": "1.0.0",
+  "description": "Simplified redux state management",
+  "author": "waynebloss@gmail.com",
+  "license": "MIT",
+  "keywords": [
+    "rebjs",
+    "redux",
+    "state",
+    "redux-persist"
+  ],
+  "homepage": "https://github.com/rebjs/state#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rebjs/state.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rebjs/state/issues"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "LICENSE.md",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dot-prop-immutable": "^1.5.0",
+    "redux": "^4.0.1",
+    "redux-devtools-extension": "^2.13.7",
+    "tslib": "^1.9.3"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^3.2.1"
+  }
+}
