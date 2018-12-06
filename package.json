@@ -28,6 +28,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "copy-defs": "copyfiles \"src/**/*.d.ts\" lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

@@ -1,12 +1,7 @@
-export interface StorageAreaConfig {
-  /** Time in milliseconds to throttle writes to the storage area. */
-  throttle?: number;
-}
-
-export interface LocalStorageAreaConfig extends StorageAreaConfig {
-  /** Key for this area in the local storage. */
-  key: string;
-}
+import {
+  LocalStorageAreaConfig,
+  StorageArea,
+} from "./storage";
 
 function getStorageDriver(type: string): Storage {
   let driver: Storage;
@@ -27,13 +22,13 @@ function getStorageDriver(type: string): Storage {
 }
 
 /** Creates a local storage area.
- * @param type Type of local storage. (local, session)
- * @param config Storage area configuration.
+ * @param [type] Type of local storage. (local, session)
+ * @param [config] Storage area configuration.
  */
 export function createStorageLocal(
   type: "local" | "session" = "local",
   config: LocalStorageAreaConfig = { key: "state" }
-) {
+): StorageArea {
   // const {
   //   key: rootKey,
   //   keyPrefix = "persist:",
@@ -83,8 +78,7 @@ export function createStorageLocal(
     },
     /** Storage area configuration. */
     config,
-    /** @param keyOrKeys
-     */
+    /** @param keyOrKeys */
     get(keyOrKeys: string | string[] | { [s: string]: boolean } | null): Promise<any> {
       let data;
       if (typeof keyOrKeys === "string") {
