@@ -23,6 +23,8 @@ export interface StorageAreaConfig {
   throttle?: number;
 }
 
+export type StorageAreaMap = { [key: string]: StorageArea };
+
 export interface StorageConfig {
   /** Name of the default storage area. Default: **local** */
   defaultArea?: string;
@@ -38,7 +40,7 @@ export type StorageKeyOrKeys = string | string[];
 
 export interface StorageStrategy {
   /** Map of storage areas by name. */
-  areas: { [key: string]: StorageArea };
+  areas: StorageAreaMap;
   /** Clears all storage areas. **Does NOT clear the in-memory state.**
    * @returns An array of storage area keys cleared. */
   clear: () => Promise<string[]>;
