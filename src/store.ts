@@ -2,27 +2,43 @@ import {
   applyMiddleware,
   combineReducers,
   createStore,
+
+  AnyAction,
+  Dispatch,
+  Middleware,
+  Reducer,
+  Unsubscribe,
 } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension/developmentOnly";
+import {
+  ReducerMap,
+  StorageStrategy,
+  StorageStrategyClass,
+  StorageStrategyFactory,
+  StoreConfig,
+} from "./";
 import { mapReducersOf } from "./reducers";
-import { StorageStrategy } from "./storage/storage";
+import { DefaultStorageStrategy } from "./storage/strategy";
 
 /** Creates a reducer that does not persist to storage.
  * @param {StateStore} store
- * @param {{[x:string]:Reducer}} reducers
+ * @param {ReducerMap} reducers
  * @returns {Reducer}
  */
-function createNonStorageReducer(store, reducers) {
+function createNonStorageReducer(
+  store: StateStore,
+  reducers: ReducerMap
+): Reducer {
   return combineReducers(reducers);
 }
 /** @param {StateStore} store */
-function createReduxStore(store) {
+function createReduxStore(store: StateStore) {
   const {
     createReducer,
     states,
   } = store.config;
   const reducerMap = mapReducersOf(states);
-  const rootReducer = createReducer(store, reducerMap.reducers);
+  const rootReducer = createReducer!(store, reducerMap.reducers);
   const storeEnhancer = createStoreEnhancer(store);
   return createStore(
     rootReducer,
@@ -31,8 +47,8 @@ function createReduxStore(store) {
   );
 }
 /** @param {StateStore} store */
-function createStoreEnhancer({ config: { middleware, thunk, logger } }) {
-  let toApply = [];
+function createStoreEnhancer({ config: { middleware, thunk, logger } }: StateStore) {
+  let toApply: Middleware[] = [];
   if (middleware) {
     toApply = toApply.concat(middleware);
   }
@@ -61,24 +77,24 @@ function createStoreEnhancer({ config: { middleware, thunk, logger } }) {
 }
 /** Redux state store with persistence and syncing. */
 export class StateStore {
+
+  config: StoreConfig;
+  storage?: StorageStrategy;
+
   /** Creates a new `StateStore`.
-   * @param {StoreConfig} config */
-  constructor(config) {
+   * @param config */
+  constructor(config: StoreConfig) {
     // #region Normalize storageConfig and storageAreas.
     let {
       storageAreas,
       storageConfig = {},
     } = config;
-    /** @type {typeof StorageStrategy} */
-    let StorageStrat = storageConfig.stategy;
+    let StorageStrat = storageConfig.strategy;
     if (typeof storageAreas === "string" && storageAreas === "default") {
       storageAreas = undefined;
-      StorageStrat = StorageStrat || StorageStrategy;
+      StorageStrat = StorageStrat || DefaultStorageStrategy;
     } else if (storageAreas && !StorageStrat) {
-      StorageStrat = StorageStrategy;
-    }
-    if (!storageAreas && StorageStrat && StorageStrat.createDefaultAreas) {
-      storageAreas = StorageStrat.createDefaultAreas();
+      StorageStrat = DefaultStorageStrategy;
     }
     // #endregion
     // #region Normalize config as much as possible.
@@ -91,7 +107,7 @@ export class StateStore {
       storageAreas,
       storageConfig: {
         ...storageConfig,
-        stategy: StorageStrat,
+        strategy: StorageStrat,
       },
     };
     this.config = config;
@@ -101,15 +117,15 @@ export class StateStore {
      * @type {StorageStrategy}
      */
     this.storage = StorageStrat
-      ? StorageStrat.create
-        ? StorageStrat.create(this)
-        : new StorageStrat(this)
+      ? (<StorageStrategyFactory>StorageStrat).create
+        ? (<StorageStrategyFactory>StorageStrat).create(this)
+        : new (<StorageStrategyClass>StorageStrat)(this)
       : undefined;
     let {
       createReducer = StorageStrat
-        ? StorageStrat.createReducer
-          ? StorageStrat.createReducer
-          : this.storage.createReducer || createNonStorageReducer
+        ? (<StorageStrategy>StorageStrat).createReducer
+          ? (<StorageStrategy>StorageStrat).createReducer
+          : this.storage!.createReducer || createNonStorageReducer
         : createNonStorageReducer,
     } = config;
     config.createReducer = createReducer;
@@ -122,4 +138,8 @@ export class StateStore {
     this.subscribe = redux.subscribe;
     // #endregion
   }
+  dispatch: Dispatch<AnyAction>
+  getState: () => any;
+  replaceReducer: (nextReducer: Reducer<any, AnyAction>) => void;
+  subscribe: (listener: () => void) => Unsubscribe;
 }
