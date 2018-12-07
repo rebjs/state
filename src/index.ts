@@ -6,6 +6,7 @@ import {
 export * from "./storage/local";
 export * from "./storage/strategy";
 export * from "./reducers";
+export * from "./store";
 
 export interface LocalStorageAreaConfig extends StorageAreaConfig {
   /** Key for this area in the local storage. */
@@ -52,17 +53,17 @@ export interface StorageStrategy {
    * @returns An array of storage area keys cleared. */
   clear: () => Promise<string[]>;
   /** Creates a reducer that persists to storage. */
-  createReducer?: (store: any, reducers: ReducerMap) => any;
+  createReducer?: (store: import('./store').StateStore, reducers: ReducerMap) => any;
   /** Loads storage and starts any configured persistence or syncing. */
   load: () => Promise<void>;
 }
 export interface StorageStrategyClass {
-  new(store: any): StorageStrategy;
+  new(store: import('./store').StateStore): StorageStrategy;
 }
 export type StorageStrategyType =
   StorageStrategy | StorageStrategyClass | StorageStrategyFactory;
 export interface StorageStrategyFactory {
-  create: (store: any) => StorageStrategy;
+  create: (store: import('./store').StateStore) => StorageStrategy;
 }
 export interface StoreConfig {
   /** Function to create the root reducer. If none is passed, the built-in

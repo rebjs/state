@@ -2,7 +2,7 @@ import {
   applyMiddleware,
   combineReducers,
   createStore,
-
+  // Types
   AnyAction,
   Dispatch,
   Middleware,
@@ -21,9 +21,8 @@ import { mapReducersOf } from "./reducers";
 import { DefaultStorageStrategy } from "./storage/strategy";
 
 /** Creates a reducer that does not persist to storage.
- * @param {StateStore} store
- * @param {ReducerMap} reducers
- * @returns {Reducer}
+ * @param store
+ * @param reducers
  */
 function createNonStorageReducer(
   store: StateStore,
@@ -31,7 +30,7 @@ function createNonStorageReducer(
 ): Reducer {
   return combineReducers(reducers);
 }
-/** @param {StateStore} store */
+/** @param store */
 function createReduxStore(store: StateStore) {
   const {
     createReducer,
@@ -46,7 +45,7 @@ function createReduxStore(store: StateStore) {
     storeEnhancer,
   );
 }
-/** @param {StateStore} store */
+/** @param store */
 function createStoreEnhancer({ config: { middleware, thunk, logger } }: StateStore) {
   let toApply: Middleware[] = [];
   if (middleware) {
@@ -79,7 +78,11 @@ function createStoreEnhancer({ config: { middleware, thunk, logger } }: StateSto
 export class StateStore {
 
   config: StoreConfig;
+  dispatch: Dispatch<AnyAction>
+  getState: () => any;
+  replaceReducer: (nextReducer: Reducer<any, AnyAction>) => void;
   storage?: StorageStrategy;
+  subscribe: (listener: () => void) => Unsubscribe;
 
   /** Creates a new `StateStore`.
    * @param config */
@@ -92,7 +95,9 @@ export class StateStore {
     let StorageStrat = storageConfig.strategy;
     if (typeof storageAreas === "string" && storageAreas === "default") {
       storageAreas = undefined;
-      StorageStrat = StorageStrat || DefaultStorageStrategy;
+      if (!StorageStrat) {
+        StorageStrat = DefaultStorageStrategy;
+      }
     } else if (storageAreas && !StorageStrat) {
       StorageStrat = DefaultStorageStrategy;
     }
@@ -113,9 +118,6 @@ export class StateStore {
     this.config = config;
     // #endregion
     // #region Create storage strategy and configure createReducer.
-    /** A storage strategy class or object with factory methods.
-     * @type {StorageStrategy}
-     */
     this.storage = StorageStrat
       ? (<StorageStrategyFactory>StorageStrat).create
         ? (<StorageStrategyFactory>StorageStrat).create(this)
@@ -138,8 +140,4 @@ export class StateStore {
     this.subscribe = redux.subscribe;
     // #endregion
   }
-  dispatch: Dispatch<AnyAction>
-  getState: () => any;
-  replaceReducer: (nextReducer: Reducer<any, AnyAction>) => void;
-  subscribe: (listener: () => void) => Unsubscribe;
 }

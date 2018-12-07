@@ -5,6 +5,7 @@ import {
 
 import {
   ReducerMap,
+  StateStore,
   StorageAreaMap,
   StorageStrategy,
 } from "../";
@@ -19,7 +20,7 @@ export class DefaultStorageStrategy implements StorageStrategy {
    * @param store
    * @param reducers
    */
-  static createReducer(store: any, reducers: ReducerMap): Reducer {
+  static createReducer(store: StateStore, reducers: ReducerMap): Reducer {
     const {
       storageAreas,
       storageConfig: {
@@ -34,19 +35,19 @@ export class DefaultStorageStrategy implements StorageStrategy {
       if (newState === oldState) {
         return state;
       }
-      storageAreas[defaultArea].set(state);
+      storageAreas![defaultArea].set(state);
       return newState;
     };
   }
 
   areas: StorageAreaMap;
 
-  /** @param {import("../").StateStore} store */
-  constructor(store: any) {
+  /** @param store */
+  constructor(store: StateStore) {
     const {
       storageAreas = { local: createStorageLocal() },
     } = store.config;
-    this.areas = storageAreas;
+    this.areas = <StorageAreaMap>storageAreas;
   }
   /** Clears all storage areas. **Does NOT clear the in-memory state.**
    * @returns Array of storage area keys cleared.
