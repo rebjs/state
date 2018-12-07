@@ -27,8 +27,9 @@
     "README.md"
   ],
   "scripts": {
-    "build": "run-s build-js copy-defs",
+    "build": "run-s clean build-js copy-defs",
     "build-js": "tsc",
+    "clean": "shx rm -rf \"lib/*\"",
     "copy-defs": "copyfiles -u 1 \"src/**/*.d.ts\" lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
