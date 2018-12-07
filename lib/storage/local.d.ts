@@ -1,4 +1,4 @@
-import { LocalStorageAreaConfig, StorageArea } from "./storage";
+import { LocalStorageAreaConfig, StorageArea } from "../";
 /** Creates a local storage area.
  * @param [type] Type of local storage. (local, session)
  * @param [config] Storage area configuration.

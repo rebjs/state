@@ -1,5 +1,5 @@
 import "chrome";
-import { StorageArea, StorageAreaConfig } from "./storage";
+import { StorageArea, StorageAreaConfig } from "../";
 /** Creates a Chrome storage area interface for use inside a Chrome extension
  * or a Chrome app.
  * @param [type] Type of Chrome storage. (local, sync, etc)
