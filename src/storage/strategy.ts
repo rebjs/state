@@ -7,7 +7,7 @@ import {
   ReducerMap,
   StorageAreaMap,
   StorageStrategy,
-} from "./storage";
+} from "../";
 import { createStorageLocal } from "./local";
 
 /** The default storage strategy and base class.

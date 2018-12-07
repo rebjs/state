@@ -1,7 +1,7 @@
 import {
   LocalStorageAreaConfig,
   StorageArea,
-} from "./storage";
+} from "../";
 
 function getStorageDriver(type: string): Storage {
   let driver: Storage;

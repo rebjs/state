@@ -5,7 +5,7 @@ import {
   StorageAreaConfig,
   StorageKeyMap,
   StorageKeyOrKeys,
-} from "./storage";
+} from "../";
 
 /** Creates a Chrome storage area interface for use inside a Chrome extension
  * or a Chrome app.
