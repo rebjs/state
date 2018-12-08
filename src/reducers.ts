@@ -26,7 +26,10 @@ export function maybeInjectReducer(
  * @param reducerName Name of the reducer to load data for.
  */
 export function preloadReducerState(reducerName: string): any {
-  const json = localStorage.getItem("persist:reduxPersist") || "";
+  const json = localStorage.getItem("persist:reduxPersist");
+  if (!json) {
+    return undefined;
+  }
   const loadedData = JSON.parse(json);
   return loadedData[reducerName];
 }
