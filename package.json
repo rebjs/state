@@ -1,6 +1,6 @@
 {
   "name": "@reb/state",
-  "version": "1.0.0",
+  "version": "0.10.0",
   "description": "Simplified redux state management",
   "author": "waynebloss@gmail.com",
   "license": "MIT",
@@ -27,11 +27,17 @@
     "README.md"
   ],
   "scripts": {
+    "patch-build": "run-s version-patch build",
+    "minor-build": "run-s version-minor build",
+    "major-build": "run-s version-major build",
     "build": "run-s clean build-js copy-defs",
     "build-js": "tsc",
     "clean": "shx rm -rf \"lib/*\"",
     "copy-defs": "copyfiles -u 1 \"src/**/*.d.ts\" lib",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "version-major": "npm version major --no-git-tag-version",
+    "version-minor": "npm version minor --no-git-tag-version",
+    "version-patch": "npm version patch --no-git-tag-version"
   },
   "dependencies": {
     "dot-prop-immutable": "^1.5.0",

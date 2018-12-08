@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { ReducerMap, StateStore, StorageAreaMap, StorageStrategy } from "../";
+import { ReducerMap, StateStore, StorageAreaMap, StorageStrategy } from "../..";
 /** The default storage strategy and base class.
  * NOTE: A storage strategy does not have to be a `class`. It can be an object
  * that has a functional `create` property.
