@@ -1,6 +1,6 @@
 {
   "name": "@reb/state",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Simplified redux state management",
   "author": "waynebloss@gmail.com",
   "license": "MIT",
