@@ -18,7 +18,7 @@ import {
   StoreConfig,
 } from "./";
 import { mapReducersOf } from "./reducers";
-import { DefaultStorageStrategy } from "./storage/strategy";
+import { DefaultStorageStrategy } from "./storage/strategy/DefaultStorageStrategy";
 
 /** Creates a reducer that does not persist to storage.
  * @param store
@@ -31,17 +31,20 @@ function createNonStorageReducer(
   return combineReducers(reducers);
 }
 /** @param store */
-function createReduxStore(store: StateStore) {
+function createReduxStore(
+  store: StateStore,
+  reducers: ReducerMap,
+  preloadedState?: any
+) {
   const {
     createReducer,
     states,
   } = store.config;
-  const reducerMap = mapReducersOf(states);
-  const rootReducer = createReducer!(store, reducerMap.reducers);
+  const rootReducer = createReducer!(store, reducers);
   const storeEnhancer = createStoreEnhancer(store);
   return createStore(
     rootReducer,
-    reducerMap.preloadedState,
+    preloadedState,
     storeEnhancer,
   );
 }
@@ -115,6 +118,7 @@ export class StateStore {
         strategy: StorageStrat,
       },
     };
+    storageConfig = config.storageConfig!;
     this.config = config;
     // #endregion
     // #region Create storage strategy and configure createReducer.
@@ -133,7 +137,15 @@ export class StateStore {
     config.createReducer = createReducer;
     // #endregion
     // #region Create the store.
-    const redux = createReduxStore(this);
+    const { states } = config;
+    const mapped = mapReducersOf(states);
+    storageConfig['persistBlacklist'] = mapped.noPersist;
+    storageConfig['persistPurgeKeys'] = mapped.defaultPurgeKeys;
+    const redux = createReduxStore(
+      this,
+      mapped.reducers,
+      mapped.preloadedState
+    );
     this.dispatch = redux.dispatch;
     this.getState = redux.getState;
     this.replaceReducer = redux.replaceReducer;

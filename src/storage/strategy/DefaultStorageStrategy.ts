@@ -8,8 +8,8 @@ import {
   StateStore,
   StorageAreaMap,
   StorageStrategy,
-} from "../";
-import { createStorageLocal } from "./local";
+} from "../..";
+import { createStorageLocal } from "../local";
 
 /** The default storage strategy and base class.
  * NOTE: A storage strategy does not have to be a `class`. It can be an object

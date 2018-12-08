@@ -4,7 +4,7 @@ import {
 } from "redux";
 
 export * from "./storage/local";
-export * from "./storage/strategy";
+export * from "./storage/strategy/DefaultStorageStrategy";
 export * from "./reducers";
 export * from "./store";
 
@@ -53,7 +53,7 @@ export interface StorageStrategy {
    * @returns An array of storage area keys cleared. */
   clear: () => Promise<string[]>;
   /** Creates a reducer that persists to storage. */
-  createReducer?: (store: import('./store').StateStore, reducers: ReducerMap) => any;
+  createReducer?: ReducerCreator;
   /** Loads storage and starts any configured persistence or syncing. */
   load: () => Promise<void>;
 }
