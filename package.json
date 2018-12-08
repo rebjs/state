@@ -34,6 +34,7 @@
     "build-js": "tsc",
     "clean": "shx rm -rf \"lib/*\"",
     "copy-defs": "copyfiles -u 1 \"src/**/*.d.ts\" lib",
+    "pub": "npm publish --access public",
     "test": "echo \"Error: no test specified\" && exit 1",
     "version-major": "npm version major --no-git-tag-version",
     "version-minor": "npm version minor --no-git-tag-version",
