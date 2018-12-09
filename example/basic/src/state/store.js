@@ -1,19 +1,26 @@
 import { StateStore } from '@reb/state';
 import {
-  ReduxPersistStorageStrategy,
-} from '@reb/state/lib/storage/strategy/ReduxPersistStorageStrategy';
+  createReduxPersistStorage,
+} from '@reb/state/lib/storage/strategy/redux-persist';
 import { createLogger } from 'redux-logger';
+import persistLocalStorage from "redux-persist/lib/storage";
 import thunk from 'redux-thunk';
 
 import states from './states';
 
 export const store = new StateStore({
-  logLevel: 1,
-  logger: process.env.NODE_ENV === 'development' ? createLogger() : undefined,
-  states,
-  storageConfig: {
-    strategy: ReduxPersistStorageStrategy,
+  middleware: {
+    logging: process.env.NODE_ENV === 'development'
+      ? createLogger()
+      : undefined,
+    thunking: thunk,
   },
-  thunk,
+  states,
+  storage: createReduxPersistStorage({
+    debug: true,
+    key: 'reduxPersist',
+    // serialize: false,
+    storage: persistLocalStorage,
+  }),
 });
 export default store;
