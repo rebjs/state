@@ -31,11 +31,11 @@ export function preloadReducerState(reducerName: string): any {
     return undefined;
   }
   const json = jsons[reducerName];
-  if (!reducerName) {
-    return;
+  if (!json) {
+    return undefined;
   }
   const loadedData = JSON.parse(json);
-  return loadedData[reducerName];
+  return loadedData;
 }
 /** Returns the `reducer` of the given `reducerSpec` or creates one from its
  * `handlers` and `defaults` properties.
