@@ -19,7 +19,6 @@ export const store = new StateStore({
   storage: createReduxPersistStorage({
     debug: true,
     key: 'reduxPersist',
-    // serialize: false,
     storage: persistLocalStorage,
   }),
 });
