@@ -8,10 +8,6 @@ export * from "./storage/strategy/DefaultStorageStrategy";
 export * from "./reducers";
 export * from "./store";
 
-export interface LocalStorageAreaConfig extends StorageAreaConfig {
-  /** Key for this area in the local storage. */
-  key: string;
-}
 export type ReducerCreator = (
   store: import('./store').StateStore,
   reducers: ReducerMap
@@ -20,8 +16,6 @@ export type ReducerMap = { [key: string]: Reducer };
 export interface StorageArea {
   /** Removes all items from storage. */
   clear(): Promise<void>;
-  /** Configuration for the storage area. */
-  config: StorageAreaConfig;
   /** Gets one or more items from storage. */
   get(keyOrKeys: StorageKeyOrKeys | StorageKeyMap | null): Promise<any>;
   /** Removes one or more items from storage. */
@@ -29,43 +23,30 @@ export interface StorageArea {
   /** Sets multiple items. */
   set(items: StorageKeyMap): Promise<void>;
 }
-export interface StorageAreaConfig {
-  /** Time in milliseconds to throttle writes to the storage area. */
-  throttle?: number;
-}
-export type StorageAreaMap = { [key: string]: StorageArea };
-export type StorageAreaMapConfig = StorageAreaMap | string;
-export interface StorageConfig {
-  /** Name of the default storage area. Default: **local** */
-  defaultArea?: string;
-  /** Storage strategy class or factory. */
-  strategy?: StorageStrategyType;
-  /** Default time in milliseconds to throttle writes to a given storage area.
-   * May be overridden by individual storage area config. */
-  throttle?: number;
-}
 export type StorageKeyMap = { [key: string]: any };
 export type StorageKeyOrKeys = string | string[];
+/** Exposes state storage functions. */
 export interface StorageStrategy {
-  /** Map of storage areas by name. */
-  areas: StorageAreaMap;
-  /** Clears all storage areas. **Does NOT clear the in-memory state.**
-   * @returns An array of storage area keys cleared. */
-  clear: () => Promise<string[]>;
+  /** Immediately writes all pending state to storage. */
+  flush: () => Promise<any>;
+  /** Called by `StateStore` to initialize the strategy. */
+  init: (store: import('./store').StateStore) => StorageStrategyConfig;
+  /** Loads storage and starts any configured persistence or syncing. */
+  load: () => Promise<any>;
+  /** Pauses storage persistence. */
+  pause: () => any;
+  /** Resumes storage persistence. */
+  persist: () => any;
+  /** Purges state from storage. */
+  purge: () => Promise<any>;
+}
+/** Storage strategy configuration provided for `StateStore`. */
+export interface StorageStrategyConfig {
   /** Creates a reducer that persists to storage. */
   createReducer?: ReducerCreator;
-  /** Loads storage and starts any configured persistence or syncing. */
-  load: () => Promise<void>;
 }
-export interface StorageStrategyClass {
-  new(store: import('./store').StateStore): StorageStrategy;
-}
-export type StorageStrategyType =
-  StorageStrategy | StorageStrategyClass | StorageStrategyFactory;
-export interface StorageStrategyFactory {
-  create: (store: import('./store').StateStore) => StorageStrategy;
-}
-export interface StoreConfig {
+/** Options used to create a `StateStore`. */
+export interface StoreOptions {
   /** Function to create the root reducer. If none is passed, the built-in
    * `createStorageReducer` will be used. */
   createReducer?: ReducerCreator;
@@ -77,10 +58,8 @@ export interface StoreConfig {
   middleware?: Middleware[];
   /** State reducer configurations. */
   states: any[];
-  /** Map of storage areas. */
-  storageAreas?: StorageAreaMapConfig;
-  /** Store-wide storage configuration. */
-  storageConfig?: StorageConfig;
+  /** Storage strategy object. */
+  storage?: StorageStrategy;
   /** Middleware for thunking. (e.g. redux-thunk) */
   thunk?: Middleware;
 }

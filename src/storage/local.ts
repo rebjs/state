@@ -1,6 +1,7 @@
 import {
-  LocalStorageAreaConfig,
   StorageArea,
+  StorageKeyMap,
+  StorageKeyOrKeys,
 } from "../";
 
 function getStorageDriver(type: string): Storage {
@@ -21,18 +22,24 @@ function getStorageDriver(type: string): Storage {
   return driver;
 }
 
+export interface LocalStorageArea extends StorageArea {
+  key: string;
+}
+
+export interface LocalStorageAreaOptions {
+  /** Key in `localStorage` to store state for this area. */
+  key: string;
+}
 /** Creates a local storage area.
  * @param [type] Type of local storage. (local, session)
  * @param [config] Storage area configuration.
  */
 export function createStorageLocal(
   type: "local" | "session" = "local",
-  config: LocalStorageAreaConfig = { key: "state" }
-): StorageArea {
-  // const {
-  //   key: rootKey,
-  //   keyPrefix = "persist:",
-  // } = config;
+  options: LocalStorageAreaOptions = { key: "state" }
+): LocalStorageArea {
+
+  const { key: rootKey } = options;
   const driver = getStorageDriver(type);
 
   /** @param key
@@ -76,10 +83,8 @@ export function createStorageLocal(
       driver.clear();
       return Promise.resolve();
     },
-    /** Storage area configuration. */
-    config,
     /** @param keyOrKeys */
-    get(keyOrKeys: string | string[] | { [s: string]: boolean } | null): Promise<any> {
+    get(keyOrKeys: StorageKeyOrKeys | StorageKeyMap | null): Promise<any> {
       let data;
       if (typeof keyOrKeys === "string") {
         data = getDataForKey(keyOrKeys);
@@ -94,8 +99,10 @@ export function createStorageLocal(
       data = getDataWithDefaults(<object>keyOrKeys);
       return Promise.resolve(data);
     },
+    /** Key in `localStorage` to store state for this area. */
+    key: rootKey,
     /** @param keyOrKeys */
-    remove(keyOrKeys: string | string[]): Promise<void> {
+    remove(keyOrKeys: StorageKeyOrKeys): Promise<void> {
       if (keyOrKeys) {
         if (typeof keyOrKeys === "string") {
           driver.removeItem(keyOrKeys);
@@ -106,7 +113,7 @@ export function createStorageLocal(
       return Promise.resolve();
     },
     /** @param items */
-    set(items: { [key: string]: any }): Promise<void> {
+    set(items: StorageKeyMap): Promise<void> {
       const keys = Object.keys(items);
       const len = keys.length;
       for (let i = 0; i < len; i++) {

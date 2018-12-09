@@ -15,7 +15,7 @@ import {
   StorageStrategy,
   StorageStrategyClass,
   StorageStrategyFactory,
-  StoreConfig,
+  StoreOptions,
 } from "./";
 import { mapReducersOf } from "./reducers";
 import { DefaultStorageStrategy } from "./storage/strategy/DefaultStorageStrategy";
@@ -38,7 +38,6 @@ function createReduxStore(
 ) {
   const {
     createReducer,
-    states,
   } = store.config;
   const rootReducer = createReducer!(store, reducers);
   const storeEnhancer = createStoreEnhancer(store);
@@ -80,7 +79,7 @@ function createStoreEnhancer({ config: { middleware, thunk, logger } }: StateSto
 /** Redux state store with persistence and syncing. */
 export class StateStore {
 
-  config: StoreConfig;
+  config: StoreOptions;
   dispatch: Dispatch<AnyAction>
   getState: () => any;
   replaceReducer: (nextReducer: Reducer<any, AnyAction>) => void;
@@ -89,7 +88,7 @@ export class StateStore {
 
   /** Creates a new `StateStore`.
    * @param config */
-  constructor(config: StoreConfig) {
+  constructor(config: StoreOptions) {
     // #region Normalize storageConfig and storageAreas.
     let {
       storageAreas,
