@@ -31,20 +31,25 @@ function createReduxStore(
   );
 }
 
-function createStoreEnhancer({ middleware, thunk, logger }: StoreOptions) {
+function createStoreEnhancer({ middleware = {} }: StoreOptions) {
   let toApply: Middleware[] = [];
-  if (middleware) {
+  let logging: Middleware | Middleware[] | undefined;
+  let thunking: Middleware | Middleware[] | undefined;
+  if (Array.isArray(middleware)) {
     toApply = toApply.concat(middleware);
+  } else {
+    logging = middleware.logging;
+    thunking = middleware.thunking;
   }
   // Thunk should probably be last, but before logger.
   // See https://github.com/reduxjs/redux-thunk/issues/134
-  if (thunk) {
-    toApply.push(thunk);
+  if (thunking) {
+    toApply = toApply.concat(thunking);
   }
   // Logger must be LAST.
   // See https://github.com/evgenyrodionov/redux-logger#usage
-  if (logger) {
-    toApply.push(logger);
+  if (logging) {
+    toApply = toApply.concat(logging);
   }
   const middlewareEnhancer = applyMiddleware(
     // ORDER: LEFT-TO-RIGHT - The FIRST toApply is executed FIRST.

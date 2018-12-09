@@ -46,21 +46,25 @@ export interface StorageConfig {
   /** Creates a reducer that persists to storage. */
   createReducer?: ReducerCreator;
 }
+/** Options to setup common middlewares. */
+export interface StoreMiddlewareOptions {
+  /** Middleware for logging (e.g. redux-logger). Applied last. */
+  logging?: Middleware | Middleware[];
+  /** All other middleware. Applied first. */
+  other?: Middleware | Middleware[];
+  /** Middleware for thunking (e.g. redux-thunk). Applied near last,
+   * immediately before logging middleware. */
+  thunking?: Middleware | Middleware[];
+}
 /** Options used to create a `StateStore`. */
 export interface StoreOptions {
   /** Function to create the root reducer. If none is passed, the built-in
    * `createStorageReducer` will be used. */
   createReducer?: ReducerCreator;
-  /** (0: Off, 1: Debug, 2: Info, 3: Warn, 4: Error) */
-  logLevel?: number;
-  /** Middleware for logging. (e.g. redux-logger) */
-  logger?: Middleware;
-  /** All other middleware. */
-  middleware?: Middleware[];
+  /** Middleware options or array of middleware for redux. */
+  middleware?: StoreMiddlewareOptions | Middleware[];
   /** State reducer configurations. */
   states: any[];
   /** Storage strategy object. */
   storage?: StorageStrategy | boolean;
-  /** Middleware for thunking. (e.g. redux-thunk) */
-  thunk?: Middleware;
 }
