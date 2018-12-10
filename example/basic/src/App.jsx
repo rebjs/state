@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import logo from './assets/img/logo.svg';
 import { SidePanel } from './components';
 
-class App extends Component {
+class App extends React.Component {
 
   render() {
     return (
@@ -17,5 +17,4 @@ class App extends Component {
     );
   }
 }
-
 export default App;
