@@ -7,9 +7,10 @@ import App from './App';
 import { store } from './state';
 
 function main() {
-  store.storage.load()
-    .catch(err => { console.warn(err); });
-
+  if (store.storage) {
+    store.storage.load()
+      .catch(err => { console.warn(err); });
+  }
   ReactDOM.render(
     <ReduxProvider store={store}>
       <App />

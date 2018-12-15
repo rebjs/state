@@ -1,3 +1,4 @@
+/** @file "Basic" usage with middleware and redux-persist. See README.md. */
 import { StateStore } from '@reb/state';
 import {
   createReduxPersistStorage,
