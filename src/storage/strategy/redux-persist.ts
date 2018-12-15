@@ -1,5 +1,6 @@
 import { Reducer } from "redux";
 import {
+  KEY_PREFIX,
   persistCombineReducers,
   PersistConfig,
   persistStore,
@@ -76,7 +77,7 @@ export function preloadReduxPersistLocalStorage(
 ): any {
   const {
     key,
-    keyPrefix,
+    keyPrefix = KEY_PREFIX,
   } = options;
   let json = localStorage.getItem(`${keyPrefix}${key}`);
   if (!json) {
