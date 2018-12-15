@@ -54,6 +54,9 @@ export function createDefaultStorage(options?: DefaultStorageOptions) {
     persist() {
       throw new Error("Not implemented.");
     },
+    preload(slice: string) {
+      return undefined;
+    },
     async purge() {
       const keys = Object.keys(areas);
       await Promise.all(
