@@ -15,7 +15,6 @@ import {
   StorageStrategy,
   StoreOptions,
 } from "./";
-import { mapReducersOf } from "./reducers";
 import { createDefaultStorage } from "./storage/strategy/default";
 
 function createReduxStore(
@@ -30,7 +29,6 @@ function createReduxStore(
     storeEnhancer,
   );
 }
-
 function createStoreEnhancer({ middleware = {} }: StoreOptions) {
   let toApply: Middleware[] = [];
   let logging: Middleware | Middleware[] | undefined;
@@ -64,6 +62,74 @@ function createStoreEnhancer({ middleware = {} }: StoreOptions) {
     middlewareEnhancer,
   );
 }
+/** Returns a map of reducers created from and meta-data gathered from the given
+ * `options`.
+ * @param options
+ * @param storage
+ */
+function mapReducers(
+  options: StoreOptions,
+  storage?: StorageStrategy
+) {
+  const {
+    states: reducerSpecs,
+  } = options;
+  const defaultPurgeKeys: any[] = [];
+  const noPersist: any[] = [];
+  const reducers = {};
+  let preloadedState: any;
+
+  reducerSpecs.forEach(function prepareReducer(reducerSpec) {
+    const {
+      name,
+      persist: shouldPersist,
+      preload: shouldPreload = storage ? true : false,
+      purge: shouldPurge = shouldPersist,
+    } = reducerSpec;
+    let loadedData;
+    if (!shouldPersist) {
+      noPersist.push(name);
+    } else if (shouldPreload) {
+      loadedData = storage!.preload(name);
+      if (loadedData !== undefined) {
+        if (preloadedState === undefined)
+          preloadedState = {};
+        preloadedState[name] = loadedData;
+      }
+    }
+    if (shouldPurge) {
+      defaultPurgeKeys.push(name);
+    }
+    reducers[name] = reducerOf(reducerSpec);
+  });
+  return {
+    defaultPurgeKeys,
+    noPersist,
+    reducers,
+    preloadedState,
+  };
+}
+/** Returns the `reducer` of the given `reducerSpec` or creates one from its
+ * `handlers` and `defaults` properties.
+ * @param reducerSpec */
+function reducerOf(reducerSpec: any): Reducer {
+  const {
+    defaults = {},
+    handlers = {},
+    reducer,
+  } = reducerSpec;
+  if (reducer)
+    return reducer;
+  function autoReducer(state: any, action: AnyAction) {
+    const actionType = action.type;
+    const handler = handlers[actionType];
+    if (typeof handler !== "function")
+      return state || defaults;
+    const newState = handler(state, action);
+    return newState || state || defaults;
+  }
+  return autoReducer;
+}
 /** Redux state store with persistence and syncing. */
 export class StateStore {
 
@@ -76,7 +142,6 @@ export class StateStore {
   /** Creates a new `StateStore`. */
   constructor(options: StoreOptions) {
     const {
-      states,
       storage: storageOption,
     } = options;
     let storage: StorageStrategy | undefined;
@@ -87,7 +152,7 @@ export class StateStore {
     }
     this.storage = storage;
     let storageConfig: StorageConfig | undefined;
-    const mapping = mapReducersOf(states);
+    const mapping = mapReducers(options, storage);
     if (storage) {
       storageConfig = storage.init(this, mapping);
     }

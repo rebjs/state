@@ -5,7 +5,6 @@ import {
 
 export * from "./storage/local";
 export * from "./storage/strategy/default";
-export * from "./reducers";
 export * from "./store";
 
 export type ReducerCreator = (reducers: ReducerMap) => Reducer;
@@ -38,6 +37,8 @@ export interface StorageStrategy {
   pause: () => any;
   /** Resumes storage persistence. */
   persist: () => any;
+  /** Preloads a slice of state. */
+  preload: (slice: string) => any;
   /** Purges state from storage. */
   purge: () => Promise<any>;
 }

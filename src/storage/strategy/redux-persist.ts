@@ -12,13 +12,20 @@ import {
   StorageStrategy,
 } from "../..";
 
-export function createReduxPersistStorage(options: PersistConfig) {
+export type PersistConfigEx = PersistConfig & {
+  preload: (options: PersistConfigEx, slice: string) => any;
+};
+
+export function createReduxPersistStorage(options: PersistConfigEx) {
   /** Received in `init`. */
   let mapping: { defaultPurgeKeys: any[], noPersist: any[] };
   /** Created in `load`. */
   let persistor: Persistor;
   /** Received in `init`. */
   let store: StateStore;
+  let {
+    preload = preloadNothing,
+  } = options;
   function createReducer(reducers: ReducerMap): Reducer {
     let { blacklist } = options;
     if (blacklist) {
@@ -54,7 +61,36 @@ export function createReduxPersistStorage(options: PersistConfig) {
     },
     pause() { return persistor.pause(); },
     persist() { return persistor.persist(); },
+    preload(slice: string) { return preload(options, slice); },
     async purge() { return persistor.purge(); },
   } as StorageStrategy;
   return strategy;
+}
+/** Loads persisted reducer state data from localStorage, synchronously.
+ * @param options The redux-persist config options.
+ * @param slice State slice name to load data for.
+ */
+export function preloadReduxPersistLocalStorage(
+  options: PersistConfig,
+  slice: string
+): any {
+  const {
+    key,
+    keyPrefix,
+  } = options;
+  let json = localStorage.getItem(`${keyPrefix}${key}`);
+  if (!json) {
+    return undefined;
+  }
+  const root = JSON.parse(json) || {};
+  json = root[slice];
+  if (!json) {
+    return undefined;
+  }
+  const loadedData = JSON.parse(json);
+  return loadedData;
+}
+
+function preloadNothing(options: PersistConfig, slice: string) {
+  return undefined;
 }
