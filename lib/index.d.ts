@@ -1,7 +1,6 @@
 import { Middleware, Reducer } from "redux";
 export * from "./storage/local";
 export * from "./storage/strategy/default";
-export * from "./reducers";
 export * from "./store";
 export declare type ReducerCreator = (reducers: ReducerMap) => Reducer;
 export declare type ReducerMap = {
@@ -39,6 +38,8 @@ export interface StorageStrategy {
     pause: () => any;
     /** Resumes storage persistence. */
     persist: () => any;
+    /** Preloads a slice of state. */
+    preload: (slice: string) => any;
     /** Purges state from storage. */
     purge: () => Promise<any>;
 }
